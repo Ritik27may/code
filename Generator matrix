@@ -1,0 +1,39 @@
+exp7
+
+%1)Calculate the number of valid code words N and the code rate RC. Specify the complete Code set C.
+
+% First Part:
+% Define the generator matrix G
+G = [1 1 0 0 1 0 1;
+     0 1 1 1 1 0 0;
+     1 1 1 0 0 1 1];
+
+% Calculate the number of information bits k and code bits n
+[k, n] = size(G);
+
+% Calculate the number of valid code words N and the code rate RC
+N = 2^k;
+RC = k/n;
+pk = n-k;
+H = G(:, k+1:end)';
+
+% Generate all possible combinations of k information bits
+information_bits = dec2bin(0:N-1)-'0';
+
+% Apply the generator matrix G to each combination to get the corresponding n code bits
+code_words = mod(information_bits*G, 2);
+
+% Display the complete code set C
+disp('Complete code set C:');
+disp(code_words);
+
+
+
+%Second Part:
+
+% Convert G to systematic form
+G_sys = [eye(k) mod(G(:, k+1:end) * inv(eye(pk) - H * G(:, k+1:end)), 2)];
+
+% Display results
+disp('Generator matrix G of systematic code C:');
+disp(G_sys);
