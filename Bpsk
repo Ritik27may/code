@@ -1,0 +1,36 @@
+exp8 
+
+
+clc;
+close all;
+N=10000000;
+msg=randi([0,1],1,N);%choose 0 or 1 from range 1 to N
+polarMsg=zeros(1,N);
+%BPSK MAPPING
+for i=1:N
+    if msg(i)==0
+        polarMsg(i)=-1;
+    else
+        polarMsg(i)=1;
+    end 
+end
+ber_sim=[];
+ber_theory_erfc=[];
+for EbN0dB=0:1:11;
+    EbN0=10^(EbN0dB/10);%use to convert in dB
+    sigma=sqrt(1/(2*EbN0));%noise power
+    r=polarMsg+sigma.*randn(1,N);%r is recieved bits %randn is a matrix of 1XN
+    m_cap=(r>0);%recived bits should not be empty 
+    noe=sum(msg~=m_cap); %noe=number of errror % compare by doing Or transmitted bit and received bits
+    ber_siml=double(noe/N);%double precision store 32 bits
+    ber_sim=[ber_sim ber_siml];%allocate ber_siml value to ber_sim
+    %theoritical
+    ber_th_er=0.5*erfc(sqrt(EbN0));
+    ber_theory_erfc=[ber_theory_erfc ber_th_er];
+end
+EbN0dB=0:1:11;
+semilogy(EbN0dB,ber_sim,'-r*',EbN0dB,ber_theory_erfc,'-bo')%first ->x %second ->y %third->color  %k->is for color black
+xlabel('Eb/N0(dB)');
+ylabel('BER');
+legend('Simulation','Theory(erfc)') %by default first one will take 'simulation' and vice versa
+grid on;
